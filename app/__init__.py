@@ -1,6 +1,8 @@
+from app.routes.client import client_bp
 from flask import Flask, g
 import psycopg2
 from config.configuration import load_config
+
 
 def create_app():
     app = Flask(__name__)
@@ -20,11 +22,6 @@ def create_app():
         if db_conn is not None:
             db_conn.close()
 
-    @app.route('/')
-    def index():
-        if g.db_conn:
-            return "Connexion à la base OK !"
-        else:
-            return "Pas de connexion à la base."
+    app.register_blueprint(client_bp)
 
     return app
