@@ -21,6 +21,45 @@ DB_CONFIG = {
 def get_Connexion():
     return psycopg2.connect(**DB_CONFIG)
 
+
+@app.route('/Groupe', methods=['POST'])
+def insert_group():
+    try:
+        # Récupérer les données JSON
+        data = request.get_json()
+        nom_groupe = data.get('nom_groupe')
+
+        if not nom_groupe:
+            return jsonify({"error": True, "message": "Le champ 'nom_groupe' est requis"}), 400
+
+        # Connexion à la base de données
+        conn = get_Connexion()
+        cur = conn.cursor()
+
+        # Insertion dans la table Group (id_groupe auto-incrémenté)
+        cur.execute("INSERT INTO groupes (nom_groupe) VALUES (%s)", (nom_groupe,))
+        conn.commit()
+
+        # Nettoyage
+        cur.close()
+        conn.close()
+
+        return jsonify({
+            "error": False,
+            "message": "Groupe ajouté avec succès",
+            "data": {"nom_groupe": nom_groupe}
+        }), 201
+
+    except Exception as e:
+        return jsonify({
+            "error": True,
+            "message": f"Erreur : {str(e)}",
+            "data": None
+        }), 500
+
+
+
+
 # Route publique : liste des produits
 @app.route('/prompt', methods=['GET'])
 def get_prompt():
