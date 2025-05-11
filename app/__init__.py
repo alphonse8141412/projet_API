@@ -1,5 +1,6 @@
 from app.routes.client import client_bp
 from app.routes.groupes import groupes_bp
+from app.routes.prompt import prompt_bp
 from flask import Flask, g
 import psycopg2
 from config.configuration import load_config
@@ -25,5 +26,6 @@ def create_app():
 
     app.register_blueprint(client_bp)
     app.register_blueprint(groupes_bp)
+    app.register_blueprint(prompt_bp)
 
     return app
