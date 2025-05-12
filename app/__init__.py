@@ -4,6 +4,9 @@ from app.routes.prompt import prompt_bp
 from app.routes.achats import achats_bp
 from app.routes.votes import votes_bp
 from app.routes.notes import notes_bp
+from app.routes.auth import auth_bp
+
+from flask_jwt_extended import JWTManager
 from flask import Flask, g
 import psycopg2
 from config.configuration import load_config
@@ -12,6 +15,11 @@ from config.configuration import load_config
 def create_app():
     app = Flask(__name__)
     config = load_config()
+
+   # Clé secrète pour signer les JWT (à changer en production)
+    app.config["JWT_SECRET_KEY"] = "super-secret-key"
+
+    jwt = JWTManager(app)
 
     @app.before_request
     def before_request():
@@ -33,5 +41,6 @@ def create_app():
     app.register_blueprint(achats_bp)
     app.register_blueprint(notes_bp)
     app.register_blueprint(votes_bp)
+    app.register_blueprint(auth_bp)
 
     return app
