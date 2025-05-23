@@ -1,9 +1,16 @@
 from flask import Blueprint, request, jsonify, g
+from app.decorators import role_required
+
 
 votes_bp = Blueprint('votes', __name__)
+prompt_bp = Blueprint('prompt', __name__)
+
+
+
 
 # Lire tous les votes
 @votes_bp.route('/votes', methods=['GET'])
+@role_required("utilisateur")
 def get_votes():
     cur = g.db_conn.cursor()
     cur.execute("SELECT id_vote, id_user, id_prompt, vote FROM votes;")
@@ -17,6 +24,7 @@ def get_votes():
 
 # Lire un vote par id
 @votes_bp.route('/votes/<int:id_vote>', methods=['GET'])
+@role_required("utilisateur")
 def get_vote(id_vote):
     cur = g.db_conn.cursor()
     cur.execute("SELECT id_vote, id_user, id_prompt, vote FROM votes WHERE id_vote = %s;", (id_vote,))
@@ -29,6 +37,7 @@ def get_vote(id_vote):
 
 # Créer un vote
 @votes_bp.route('/votes', methods=['POST'])
+@role_required("utilisateur")
 def add_vote():
     data = request.json
     required_fields = ['id_user', 'id_prompt', 'vote']
@@ -53,6 +62,7 @@ def add_vote():
 
 # Mettre à jour un vote
 @votes_bp.route('/votes/<int:id_vote>', methods=['PUT'])
+@role_required("utilisateur")
 def update_vote(id_vote):
     data = request.json
     fields = ['id_user', 'id_prompt', 'vote']
@@ -71,6 +81,7 @@ def update_vote(id_vote):
 
 # Supprimer un vote
 @votes_bp.route('/votes/<int:id_vote>', methods=['DELETE'])
+@role_required("utilisateur")
 def delete_vote(id_vote):
     cur = g.db_conn.cursor()
     cur.execute("DELETE FROM votes WHERE id_vote = %s;", (id_vote,))

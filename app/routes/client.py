@@ -1,9 +1,19 @@
 from flask import Blueprint, request, jsonify, g
+from app.decorators import role_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
+
 
 client_bp = Blueprint('client', __name__)
 
+
+#décorateur
+some_bp = Blueprint('some', __name__)
+
+
+ 
 # Lire tous les clients
 @client_bp.route('/clients', methods=['GET'])
+@role_required("Admin")
 def get_clients():
     cur = g.db_conn.cursor()
     cur.execute("SELECT id_client, nom_user, id_groupe, role FROM client;")
@@ -17,6 +27,7 @@ def get_clients():
 
 # Lire un client par id
 @client_bp.route('/clients/<int:id_client>', methods=['GET'])
+@role_required("Admin")
 def get_client(id_client):
     cur = g.db_conn.cursor()
     cur.execute("SELECT id_client, nom_user, id_groupe, role FROM client WHERE id_client = %s;", (id_client,))
@@ -28,21 +39,11 @@ def get_client(id_client):
         return jsonify({'error': 'Client non trouvé'}), 404
 
 # Créer un nouveau client
-@client_bp.route('/clients', methods=['POST'])
-def add_client():
-    data = request.json
-    cur = g.db_conn.cursor()
-    cur.execute(
-        "INSERT INTO client (nom_user, motpasse, id_groupe, role) VALUES (%s, %s, %s, %s) RETURNING id_client;",
-        (data['nom_user'], data['motpasse'], data['id_groupe'], data['role'])
-    )
-    new_id = cur.fetchone()[0]
-    g.db_conn.commit()
-    cur.close()
-    return jsonify({'id_client': new_id}), 201
+
 
 # Mettre à jour un client
 @client_bp.route('/clients/<int:id_client>', methods=['PUT'])
+@role_required("Admin")
 def update_client(id_client):
     data = request.json
     cur = g.db_conn.cursor()
@@ -56,6 +57,7 @@ def update_client(id_client):
 
 # Supprimer un client
 @client_bp.route('/clients/<int:id_client>', methods=['DELETE'])
+@role_required("Admin")
 def delete_client(id_client):
     cur = g.db_conn.cursor()
     cur.execute("DELETE FROM client WHERE id_client=%s;", (id_client,))

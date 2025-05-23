@@ -1,6 +1,20 @@
 from flask import Blueprint, request, jsonify, g
+# from flask_jwt_extended import jwt_required, get_jwt
+# from app.decorators import role_required
+
 
 notes_bp = Blueprint('notes', __name__)
+
+prompt_bp = Blueprint('prompt', __name__)
+
+# @prompt_bp.route('/prompts/<int:id>/vote', methods=['POST'])
+# @jwt_required()
+# def vote_prompt(id):
+#     claims = get_jwt()
+#     if claims.get("role") == "Admin":
+#         return jsonify({"error": "Les admins ne peuvent pas voter"}), 403
+    
+#     # Code pour voter...
 
 # Lire toutes les notes
 @notes_bp.route('/notes', methods=['GET'])

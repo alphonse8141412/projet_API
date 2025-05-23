@@ -1,8 +1,21 @@
 from flask import Blueprint, request, jsonify, g
+# from flask_jwt_extended import jwt_required
+# from app.decorators import role_required
+
+
 
 groupes_bp = Blueprint('groupes', __name__)
 
-# Lire tous les groupes
+
+
+# # Créer un groupe d'utilisateurs
+# @groupes_bp.route('/groupes', methods=['POST'])
+# @jwt_required()
+# @role_required('Admin')
+# def create_group():
+#     # Code pour créer un groupe
+#     pass
+# # Lire tous les groupes
 @groupes_bp.route('/groupes', methods=['GET'])
 def get_groupes():
     cur = g.db_conn.cursor()

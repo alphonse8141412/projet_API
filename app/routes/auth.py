@@ -2,23 +2,30 @@ from flask import Blueprint, request, jsonify, g
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from flask_jwt_extended import create_access_token
+from flask_jwt_extended import jwt_required
+from app.decorators import role_required
+
 
 auth_bp = Blueprint('auth', __name__)
+some_bp = Blueprint('some', __name__)
+
 
 @auth_bp.route('/register', methods=['POST'])
+@role_required("Admin")
 def register():
     data = request.json
-
-    # Vérifier que les champs nécessaires sont présents
     username = data.get('nom_user')
     password = data.get('motpasse')
-    role = data.get('role', 'utilisateur')  # rôle par défaut
+    role = data.get('role', 'utilisateur')  # Par défaut 'utilisateur'
+
+ 
 
     if not username or not password:
         return jsonify({"error": "nom_user et motpasse sont requis"}), 400
 
     # Hacher le mot de passe pour la sécurité
     hashed_password = generate_password_hash(password)
+    print(hashed_password)
 
     # Insérer l'utilisateur dans la base de données
     cur = g.db_conn.cursor()
@@ -34,10 +41,6 @@ def register():
     finally:
         cur.close()
     return jsonify({"message": "Utilisateur créé avec succès"}), 201
-
-
-
-
 
 @auth_bp.route('/login', methods=['POST'])
 def login():
@@ -62,7 +65,7 @@ def login():
         return jsonify({"error": "Mot de passe incorrect"}), 401
 
     # Générer un token JWT avec l'identité et le rôle
-    access_token = create_access_token(identity=user_id, additional_claims={"role": role})
+    access_token = create_access_token(identity=str(user_id), additional_claims={"role": role})
 
     return jsonify(access_token=access_token), 200
 

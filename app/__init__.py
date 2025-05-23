@@ -5,6 +5,7 @@ from app.routes.achats import achats_bp
 from app.routes.votes import votes_bp
 from app.routes.notes import notes_bp
 from app.routes.auth import auth_bp
+from app.routes.auth import some_bp
 
 from flask_jwt_extended import JWTManager
 from flask import Flask, g
@@ -16,8 +17,8 @@ def create_app():
     app = Flask(__name__)
     config = load_config()
 
-   # Clé secrète pour signer les JWT (à changer en production)
-    app.config["JWT_SECRET_KEY"] = "super-secret-key"
+   # Clé secrète pour signer les JWT tokens
+    app.config["JWT_SECRET_KEY"] = "code-dev-data"
 
     jwt = JWTManager(app)
 
@@ -42,5 +43,9 @@ def create_app():
     app.register_blueprint(notes_bp)
     app.register_blueprint(votes_bp)
     app.register_blueprint(auth_bp)
+    app.register_blueprint(some_bp)
+    
+    
+    
 
     return app

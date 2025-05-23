@@ -1,9 +1,16 @@
 from flask import Blueprint, request, jsonify, g
+from app.decorators import role_required
+
+
 
 prompt_bp = Blueprint('prompt', __name__)
 
+
+
+
 # Lire tous les prompts
 @prompt_bp.route('/prompts', methods=['GET'])
+@role_required("Admin")
 def get_prompts():
     cur = g.db_conn.cursor()
     cur.execute("""
@@ -27,6 +34,7 @@ def get_prompts():
 
 # Lire un prompt par id
 @prompt_bp.route('/prompts/<int:id_prompt>', methods=['GET'])
+@role_required("Admin")
 def get_prompt(id_prompt):
     cur = g.db_conn.cursor()
     cur.execute("""
@@ -50,6 +58,7 @@ def get_prompt(id_prompt):
 
 # Créer un nouveau prompt
 @prompt_bp.route('/prompts', methods=['POST'])
+@role_required("utilisateur")
 def add_prompt():
     data = request.json
     required_fields = ['nom', 'description', 'id_client', 'prix']
@@ -70,7 +79,9 @@ def add_prompt():
 
 # Mettre à jour un prompt
 @prompt_bp.route('/prompts/<int:id_prompt>', methods=['PUT'])
+@role_required("utilisateur")
 def update_prompt(id_prompt):
+    
     data = request.json
     fields = ['nom', 'description', 'id_client', 'prix', 'statut']
     set_clause = ", ".join(f"{field} = %s" for field in fields if field in data)
@@ -89,6 +100,7 @@ def update_prompt(id_prompt):
 
 # Supprimer un prompt
 @prompt_bp.route('/prompts/<int:id_prompt>', methods=['DELETE'])
+@role_required("utilisateur")
 def delete_prompt(id_prompt):
     cur = g.db_conn.cursor()
     cur.execute("DELETE FROM prompt WHERE id_prompt = %s;", (id_prompt,))
